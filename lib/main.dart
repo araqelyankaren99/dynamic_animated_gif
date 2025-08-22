@@ -7,52 +7,35 @@ import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 
 void main() {
-  runApp(const MyApp());
-}
+  runApp(
+    ColorInheritedWidget(colorNotifier: ColorNotifier(), child: const MyApp()),
+  );}
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
   static const Color _overlayColor = Color(0x66636363);
-  final _colorNotifier = ColorNotifier();
-  late Color _primaryColor = _colorNotifier.primaryColor;
-  late Color _secondaryColor = _colorNotifier.secondaryColor;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _colorNotifier.addListener((){
-      _primaryColor = _colorNotifier.primaryColor;
-      _secondaryColor = _colorNotifier.secondaryColor;
-      setState(() {});
-    });
-
-  }
 
   @override
   Widget build(BuildContext context) {
-    return ColorInheritedWidget(
-      colorNotifier: _colorNotifier,
-      child: GlobalLoaderOverlay(
+    final colorModel = ColorInheritedWidget.watch(context);
+    final primaryColor = colorModel?.primaryColor ?? Color(0xFF000000);
+    final secondaryColor = colorModel?.secondaryColor ?? Color(0xFF000000);
+
+    return GlobalLoaderOverlay(
         useDefaultLoading: false,
         overlayColor: _overlayColor,
         overlayOpacity: 1,
         overlayWidget: Center(
           child: LoaderWidget(
-            primaryColor: _primaryColor,
-            secondaryColor: _secondaryColor,
+            primaryColor: primaryColor,
+            secondaryColor: secondaryColor,
           ),
         ),
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
           home: _HomeScreen(),
         ),
-      ),
     );
   }
 }
