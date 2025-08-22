@@ -1,58 +1,40 @@
 import 'dart:math';
 
-import 'package:dynamic_animated_gif/color_inherited_widget.dart';
+import 'package:dynamic_animated_gif/change_notifier_provider.dart';
 import 'package:dynamic_animated_gif/color_notifier.dart';
 import 'package:dynamic_animated_gif/loader_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(model: ColorNotifier(), child: const MyApp()));
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
   static const Color _overlayColor = Color(0x66636363);
-  final _colorNotifier = ColorNotifier();
-  late Color _primaryColor = _colorNotifier.primaryColor;
-  late Color _secondaryColor = _colorNotifier.secondaryColor;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _colorNotifier.addListener((){
-      _primaryColor = _colorNotifier.primaryColor;
-      _secondaryColor = _colorNotifier.secondaryColor;
-      setState(() {});
-    });
-
-  }
 
   @override
   Widget build(BuildContext context) {
-    return ColorInheritedWidget(
-      colorNotifier: _colorNotifier,
-      child: GlobalLoaderOverlay(
+    final colorNotifier = ChangeNotifierProvider.watch<ColorNotifier>(context);
+    final primaryColor = colorNotifier?.primaryColor ?? Color(0xFF000000);
+    final secondaryColor = colorNotifier?.secondaryColor ?? Color(0xFF000000);
+
+    return GlobalLoaderOverlay(
         useDefaultLoading: false,
         overlayColor: _overlayColor,
         overlayOpacity: 1,
         overlayWidget: Center(
           child: LoaderWidget(
-            primaryColor: _primaryColor,
-            secondaryColor: _secondaryColor,
+            primaryColor: primaryColor,
+            secondaryColor: secondaryColor,
           ),
         ),
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
           home: _HomeScreen(),
         ),
-      ),
     );
   }
 }
@@ -86,8 +68,8 @@ class _HomeScreenState extends State<_HomeScreen> {
             ElevatedButton(onPressed: () {
               final primaryColor = _getRandomColor();
               final secondaryColor = _getRandomColor();
-              ColorInheritedWidget.of(context).colorNotifier
-                ..updatePrimaryColor(primaryColor)
+              ChangeNotifierProvider.read<ColorNotifier>(context)
+                ?..updatePrimaryColor(primaryColor)
                 ..updateSecondaryColor(secondaryColor);
             },
               child: Text('Update Colors'),),
