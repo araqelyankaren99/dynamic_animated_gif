@@ -72,9 +72,7 @@ class _HomeScreenState extends State<_HomeScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Builder(
-              builder: (context) {
-                return ElevatedButton(
+            ElevatedButton(
                   onPressed: () async {
                     final overlay = context.loaderOverlay;
                     overlay.show();
@@ -84,8 +82,6 @@ class _HomeScreenState extends State<_HomeScreen> {
                     }
                   },
                   child: Text('Show loader'),
-                );
-              },
             ),
             ElevatedButton(onPressed: () {
               final primaryColor = _getRandomColor();
